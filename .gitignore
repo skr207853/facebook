@@ -3,7 +3,7 @@
 # dependencies
 /client/node_modules
 /client/.pnp
-.pnp.js
+/client/.pnp.js
 
 # testing
 /client/coverage
@@ -25,3 +25,5 @@
 
 /server/.env
 /server/node_modules
+
+/myexp

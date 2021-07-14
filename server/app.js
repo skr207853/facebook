@@ -1,5 +1,6 @@
 const express = require("express");
 const userrouter=require("./routers/user");
+const postrouter=require("./routers/post");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
@@ -18,6 +19,7 @@ mongoose.connect(
 );
 
 app.use(userrouter);
+app.use(postrouter);
 
 app.listen(port, () => {
   console.log(`server is running on ${port}`);

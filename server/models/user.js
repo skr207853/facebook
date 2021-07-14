@@ -12,7 +12,13 @@ const UserSchema = new Schema(
     password: {
       type: String,
     },
-    friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    friends: [
+      {
+        id : {
+          type: Schema.Types.ObjectId
+        }
+      }
+    ],
     posts: [
         {
             title:String,

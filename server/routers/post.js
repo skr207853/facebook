@@ -6,7 +6,7 @@ const User = require("../models/user");
 router.post("/addpost/:id", async (req, res) => {
     try {
         const userFound = await User.findById(req.params.id);
-        const postinjson=req.body;
+        const postinjson = req.body;
         console.log(postinjson);
         await userFound.posts.push(postinjson);
         await userFound.save();
@@ -29,9 +29,9 @@ router.post("/addfriend/:ids/:idf", async (req, res) => {
             if (await userFound.friends.includes(req.params.idf)) {
                 res.send("He is already your friend.");
             } else {
-                await userFound.friends.push(new ObjectId(req.params.idf));
+                await userFound.friends.push(req.params.idf);
                 await userFound.save();
-                await userFound2.friends.push(new ObjectId(req.params.ids));
+                await userFound2.friends.push(req.params.ids);
                 await userFound2.save();
                 res.send("say.. hi to your friend");
             }
@@ -51,7 +51,7 @@ class Heap {
     }
 
     compare(x, y) {
-        return x.getTime() < y.getTime();
+        return x.date.getTime() < y.date.getTime();
     }
 
     swap(x, y) {
@@ -121,15 +121,16 @@ router.get("/feed/:id", async (req, res) => {
     try {
         const curheap = new Heap([]);
         const userFound = await User.findById(req.params.id);
-        for(frie of userFound.friends) {
-            console.log(frie['id']);
+        console.log("first " + userFound);
+        // console.log(userFound.friends[0]._id);
+        for (frie of userFound.friends) {
+            console.log(frie._id);
+            const user2 = await User.findById(frie._id);
+            const len = user2.posts.length;
+            if (len == 0) continue;
+            curheap.push([user2.posts[len-1],len,user2]);
         }
-        // for (frie of arr[req.params.id]['fr']) {
-        //     const len = arr[frie]['ar'].length;
-        //     if (len == 0) continue;
-        //     curheap.push([arr[frie]['ar'][len - 1], len, frie]);
-        // }
-        // console.log(curheap.hp);
+        console.log(curheap.hp);
         // top 5
         const curlis = [];
         while (curlis.length < 5 && !curheap.isempty()) {

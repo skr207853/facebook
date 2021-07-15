@@ -1,5 +1,5 @@
 const express = require("express");
-const {ObjectId} = require("mongodb");
+const { ObjectId } = require("mongodb");
 const router = new express.Router();
 const User = require("../models/user");
 
@@ -19,7 +19,6 @@ router.post("/addpost/:id", async (req, res) => {
         res.send("Error " + err);
     }
 });
-
 
 router.post("/addfriend/:ids/:idf", async (req, res) => {
     try {
@@ -43,7 +42,6 @@ router.post("/addfriend/:ids/:idf", async (req, res) => {
     }
 });
 
-
 class Heap {
     constructor(arr) {
         this.hp = arr;
@@ -64,7 +62,7 @@ class Heap {
         let newi, l, r;
         while (1) {
             newi = i;
-            l = i << 1 | 1;
+            l = (i << 1) | 1;
             r = l + 1;
             if (l < N && this.compare(this.hp[newi], this.hp[l])) newi = l;
             if (r < N && this.compare(this.hp[newi], this.hp[r])) newi = r;
@@ -91,7 +89,8 @@ class Heap {
     push(vl) {
         this.hp.length = this.n + 1;
         this.hp[this.n] = vl;
-        let j = this.n, p = (this.n - 1) >> 1;
+        let j = this.n,
+            p = (this.n - 1) >> 1;
         while (j > 0 && this.compare(this.hp[p], this.hp[j])) {
             this.swap(j, p);
             j = p;
@@ -114,23 +113,22 @@ class Heap {
         this.heapify(0);
         this.hp.length = this.n;
     }
-};
-
+}
 
 router.get("/feed/:id", async (req, res) => {
     try {
         const curheap = new Heap([]);
         const userFound = await User.findById(req.params.id);
-        console.log("first " + userFound);
+        // console.log("first " + userFound);
         // console.log(userFound.friends[0]._id);
         for (frie of userFound.friends) {
             console.log(frie._id);
             const user2 = await User.findById(frie._id);
             const len = user2.posts.length;
             if (len == 0) continue;
-            curheap.push([user2.posts[len-1],len,user2]);
+            curheap.push([user2.posts[len - 1], len, user2]);
         }
-        console.log(curheap.hp);
+        // console.log(curheap.hp);
         // top 5
         const curlis = [];
         while (curlis.length < 5 && !curheap.isempty()) {
@@ -142,11 +140,11 @@ router.get("/feed/:id", async (req, res) => {
             x[0] = x[2].posts[x[1] - 1];
             curheap.push(x);
         }
-        res.send(JSON.stringify(curlis));
+        // console.log(JSON.stringify(curlis));
+        res.send(curlis);
     } catch (err) {
         res.send("Error " + err);
     }
 });
 
 module.exports = router;
-

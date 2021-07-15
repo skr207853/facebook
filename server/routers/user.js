@@ -2,7 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const User = require("../models/user");
 
-router.get('/users', async (req, res) => {
+router.get("/users", async (req, res) => {
     try {
         const user = await User.find({});
         res.send(user);
@@ -11,12 +11,12 @@ router.get('/users', async (req, res) => {
     }
 });
 
-router.post('/user', async (req, res) => {
+router.post("/users", async (req, res) => {
     try {
         const user = new User({
             username: req.body.username,
             email: req.body.email,
-            password: req.body.password
+            password: req.body.password,
         });
         await user.save();
         await user.friends.push();
@@ -40,6 +40,4 @@ router.get("/user/:id", async (req, res) => {
     }
 });
 
-
 module.exports = router;
-

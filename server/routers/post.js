@@ -132,15 +132,15 @@ router.get("/feed/:id", async (req, res) => {
         // console.log(curheap.hp);
         // top 5
         const curlis = [];
-        // while (curlis.length < 5 && !curheap.isempty()) {
-        //     const x = curheap.top();
-        //     curlis.push([x[0],x[2]]);
-        //     curheap.pop();
-        //     if (x[1] == 0) continue;
-        //     x[1] -= 1;
-        //     x[0] = arr[x[2]]['ar'][x[1] - 1];
-        //     curheap.push(x);
-        // }
+        while (curlis.length < 5 && !curheap.isempty()) {
+            const x = curheap.top();
+            curlis.push(x[0]);
+            curheap.pop();
+            x[1] -= 1;
+            if (x[1] == 0) continue;
+            x[0] = x[2].posts[x[1] - 1];
+            curheap.push(x);
+        }
         res.send(JSON.stringify(curlis));
     } catch (err) {
         res.send("Error " + err);

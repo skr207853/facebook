@@ -5,6 +5,7 @@ const User = require("../models/user");
 
 router.post("/addpost/:id", async (req, res) => {
     try {
+        console.log(req.id);
         const userFound = await User.findById(req.params.id);
         const postinjson = req.body;
         console.log(postinjson);

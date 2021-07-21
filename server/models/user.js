@@ -4,16 +4,21 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
     username: {
         type: String,
+        unique: true,
     },
     email: {
         type: String,
+        unique: true,
     },
     password: {
         type: String,
     },
     friends: [
         {
-            id: Schema.Types.ObjectId,
+            id: {
+                type: Schema.Types.ObjectId,
+                unique: true,
+            },
         },
     ],
     posts: [
@@ -26,6 +31,16 @@ const UserSchema = new Schema({
             },
             description: String,
             likes: Number,
+        },
+    ],
+    friends_posts: [
+        {
+            frd_id: Schema.Types.ObjectId,
+            post_id: Schema.Types.ObjectId,
+            is_seen: {
+                type: Boolean,
+                default: false,
+            },
         },
     ],
 });

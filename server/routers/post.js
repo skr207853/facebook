@@ -1,5 +1,5 @@
 const express = require("express");
-const { ObjectId } = require("mongodb");
+const {ObjectId} = require("mongodb");
 const router = new express.Router();
 const User = require("../models/user");
 
@@ -7,14 +7,12 @@ router.post("/addpost/:id", async (req, res) => {
     try {
         const userFound = await User.findById(req.params.id);
         if (!userFound) res.send("User not found");
-        console.log(userFound);
         const postinjson = req.body;
         const len = await userFound.posts.push(postinjson);
         await userFound.save();
         const post_id = await userFound.posts[len - 1]._id;
         for (frie of userFound.friends) {
             const userFound2 = await User.findById(frie.id);
-            console.log(userFound2);
             await userFound2.friends_posts.push({
                 frd_id: userFound._id,
                 post_id: post_id,
@@ -27,27 +25,49 @@ router.post("/addpost/:id", async (req, res) => {
     }
 });
 
+
+router.get("/getpost/:userid/:friends_post_id", async (req, res) => {
+    try {
+        const userFound = await User.findById(req.params.userid);
+        const fpi = userFound.friends_posts.find(el => el._id == req.params.friends_post_id);
+        const userFound2 = await User.findById(fpi.frd_id);
+        const thepost = userFound2.posts.find(el => el._id.toString() == fpi.post_id.toString());
+        res.send(thepost);
+    } catch (e) {
+        res.send("error " + e);
+    }
+});
+
 router.post("/addfriend/:ids/:idf", async (req, res) => {
     try {
         const userFound = await User.findById(req.params.ids);
         const userFound2 = await User.findById(req.params.idf);
-        if (userFound && userFound2) {
-            if (await userFound.friends.includes({ _id: req.params.idf })) {
-                res.send("He is already your friend.");
-            } else {
-                await userFound.friends.push({
-                    id: new ObjectId(req.params.idf),
-                });
-                await userFound.save();
-                await userFound2.friends.push({
-                    id: new ObjectId(req.params.ids),
-                });
-                await userFound2.save();
-                res.send("say.. hi to your friend");
-            }
-        } else {
-            res.send("User not found");
+        if (!userFound || !userFound2) res.send("User not found");
+        if (await userFound.friends.some(el => el.id == req.params.idf)) {
+            res.send("He is already your friend.");
         }
+        await userFound.friends.push({
+            id: new ObjectId(req.params.idf),
+        });
+        await userFound.save();
+        await userFound2.friends.push({
+            id: new ObjectId(req.params.ids),
+        });
+        await userFound2.save();
+        {
+            const post_array = [];
+            userFound.posts.forEach(el=> post_array.push({
+                    'frd_id': userFound._id,
+                    'post_id': post._id,
+                    'is_seen': false
+            }));
+            const feed_array = [];
+            const feed_result_array = [];
+
+        }
+        userFound.save();
+        res.send("say.. hi to your friend");
+
     } catch (err) {
         res.send("Error " + err);
     }
@@ -56,6 +76,16 @@ router.post("/addfriend/:ids/:idf", async (req, res) => {
 router.get("/feed/:id", async (req, res) => {
     try {
         const userFound = await User.findById(req.params.id);
+        const feed_posts = [];
+        for (friend_post of userFound.friends_posts) {
+            if (friend_post.is_seen) continue;
+            // friend_post.is_seen = true;
+            userFound.save();
+            const userFound2 = await User.findById(friend_post.frd_id);
+            const thepost = userFound2.posts.find(el => el._id.toString() == friend_post.post_id.toString());
+            feed_posts.push(thepost);
+        }
+        res.send(feed_posts);
     } catch (err) {
         res.send("Error " + err);
     }
